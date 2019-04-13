@@ -26,6 +26,9 @@ class _GoogleMapsState extends State<GoogleMaps> {
   GoogleMapController mapController;
   Completer<GoogleMapController> _controller = Completer();
   
+  var geolocator = Geolocator();
+  var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
+
   static final CameraPosition _kLake = CameraPosition(
       bearing: 192.8334901395799,
       target: LatLng(37.43296265331129, -122.08832357078792),
@@ -35,12 +38,16 @@ class _GoogleMapsState extends State<GoogleMaps> {
   // @override
   void initState() {
     super.initState();
-    Geolocator().getCurrentPosition().then((currloc) {
-      setState(() {
-       currentLocation = currloc;
-       mapToggle = true; 
-       populateClients();
-      });
+
+    setState(() {
+      StreamSubscription<Position> positionStream = geolocator.getPositionStream(locationOptions).listen(
+        (Position _position) {
+            print(_position == null ? 'Unknown' : _position.latitude.toString() + ', ' + _position.longitude.toString());
+            currentLocation = _position;
+        });
+
+        mapToggle = true; 
+        populateClients();
     });
   }
 
@@ -69,7 +76,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
                           _controller.complete(controller);
                         },
                         initialCameraPosition: CameraPosition(
-                          target: LatLng(currentLocation.latitude, currentLocation.logitude),
+                          target: LatLng(currentLocation.latitude, currentLocation.longitude),
                           zoom: 10.0
                         ),
                       ) : Center(child: 
