@@ -21,12 +21,13 @@ class GoogleMaps extends StatefulWidget {
 class _GoogleMapsState extends State<GoogleMaps> {
 
   bool mapToggle = false;
-  var currentLocation;
+  // Position currentLocation = new Position();
+  var currentLocation = [];
   var clients = [];
   GoogleMapController mapController;
   Completer<GoogleMapController> _controller = Completer();
   
-  var geolocator = Geolocator();
+  Geolocator geolocator = new Geolocator();
   var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
 
   static final CameraPosition _kLake = CameraPosition(
@@ -38,22 +39,28 @@ class _GoogleMapsState extends State<GoogleMaps> {
   // @override
   void initState() {
     super.initState();
-
+    // var long2 = double.parse('$group1');
     setState(() {
       StreamSubscription<Position> positionStream = geolocator.getPositionStream(locationOptions).listen(
         (Position _position) {
-            print(_position == null ? 'Unknown' : _position.latitude.toString() + ', ' + _position.longitude.toString());
-            currentLocation = _position;
+            if(_position != null ) {
+              print(_position == null ? 'Unknown' : _position.latitude.toString() + ', ' + _position.longitude.toString());
+              // currentLocation = {
+              //   "latitude": _position.latitude,
+              //   "longitude": _position.longitude
+              // };
+              currentLocation.add(_position);
+            } else {
+              print('Error in fetching location');
+              // currentLocation = {
+              //   "latitude": 22.5726,
+              //   "longitude": 88.3639
+              // };
+            }
         });
 
         mapToggle = true; 
-        populateClients();
     });
-  }
-
-  populateClients() {
-    clients = [];
-    // Firestore.instance.
   }
 
   @override
@@ -76,7 +83,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
                           _controller.complete(controller);
                         },
                         initialCameraPosition: CameraPosition(
-                          target: LatLng(currentLocation.latitude, currentLocation.longitude),
+                          target: LatLng(23.8978328, 87.8121386),
                           zoom: 10.0
                         ),
                       ) : Center(child: 
