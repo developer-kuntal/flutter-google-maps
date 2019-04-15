@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
+var myKey = "AIzaSyD5LPQDM1bpAs6hxHa4CH1R7w3rzQ6FTKE";
 
 void main() {
   runApp(new MaterialApp(
@@ -21,26 +21,32 @@ class GoogleMaps extends StatefulWidget {
 class _GoogleMapsState extends State<GoogleMaps> {
 
   bool mapToggle = false;
-
-  var currentLocation = {
-    "latitude": 22.5726,
-    "longitude": 88.3639
-  };
-  StreamController<Position> streamController;
-  List<Position> list = [];
-
-  var clients = [];
   GoogleMapController mapController;
   Completer<GoogleMapController> _controller = Completer();
   
   Geolocator geolocator = new Geolocator();
-  var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
+  // Geolocator _geolocator = new Geolocator()..forceAndroidLocationManager = true;
+  Geolocator _geolocator = new Geolocator();
 
-  static final CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+  Future<GeolocationStatus>_getPermission() async {
+    final GeolocationStatus result = await _geolocator.checkGeolocationPermissionStatus();
+    return result;
+  }
+
+  Future<Position>_getLocation() {
+    return _getPermission().then((result) async{
+      Position coords = await geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best
+      );
+      return coords;
+    });
+  }
+
+  Future<Position>_buildMap() async{
+    return _getLocation().then((response) {
+      return response;
+    });
+  }
 
   // @override
   void initState() {
@@ -52,14 +58,14 @@ class _GoogleMapsState extends State<GoogleMaps> {
 
   @override
   Future<Position> _myStream() async{
-    var position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    var position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
     return position;
   }
 
   @override
   Widget build(BuildContext context) {
     var futureBuilder = new FutureBuilder(
-          future: _myStream(),
+          future: _buildMap(),//_myStream(),
           builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
@@ -81,6 +87,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
                         target: new LatLng(snapshot.data.latitude,snapshot.data.longitude),
                         zoom: 10.0
                       ),
+                      // onCameraMove: ,
                   );
                 }
             }
@@ -95,7 +102,6 @@ class _GoogleMapsState extends State<GoogleMaps> {
               Stack(
                 children: <Widget>[
                   Container(
-                    
                     height: MediaQuery.of(context).size.height - 100.0,
                     width: double.infinity,
                     // Wrap with stream builder could be sloved your problem...
@@ -105,22 +111,14 @@ class _GoogleMapsState extends State<GoogleMaps> {
                         ),
                       ),
                     )
+                  )
+                ],
               )
             ],
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: Text('To the lake!'),
-        icon: Icon(Icons.directions_boat),
-      ),
-    );
-  }
+          ),
 
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+          
+        );
   }
 
 }
