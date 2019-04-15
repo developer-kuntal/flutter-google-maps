@@ -21,8 +21,14 @@ class GoogleMaps extends StatefulWidget {
 class _GoogleMapsState extends State<GoogleMaps> {
 
   bool mapToggle = false;
-  // Position currentLocation = new Position();
-  var currentLocation = [];
+
+  var currentLocation = {
+    "latitude": 22.5726,
+    "longitude": 88.3639
+  };
+  StreamController<Position> streamController;
+  List<Position> list = [];
+
   var clients = [];
   GoogleMapController mapController;
   Completer<GoogleMapController> _controller = Completer();
@@ -39,57 +45,66 @@ class _GoogleMapsState extends State<GoogleMaps> {
   // @override
   void initState() {
     super.initState();
-    // var long2 = double.parse('$group1');
     setState(() {
-      StreamSubscription<Position> positionStream = geolocator.getPositionStream(locationOptions).listen(
-        (Position _position) {
-            if(_position != null ) {
-              print(_position == null ? 'Unknown' : _position.latitude.toString() + ', ' + _position.longitude.toString());
-              // currentLocation = {
-              //   "latitude": _position.latitude,
-              //   "longitude": _position.longitude
-              // };
-              currentLocation.add(_position);
-            } else {
-              print('Error in fetching location');
-              // currentLocation = {
-              //   "latitude": 22.5726,
-              //   "longitude": 88.3639
-              // };
-            }
-        });
-
         mapToggle = true; 
     });
   }
 
   @override
+  Future<Position> _myStream() async{
+    var position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return position;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: new AppBar(
-        title: Text("Google Maps Demo"),
-      ),
-      body: Column(
-        children: <Widget>[
-          Stack(
+    var futureBuilder = new FutureBuilder(
+          future: _myStream(),
+          builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+                return Text('Press button to start.');
+              case ConnectionState.active:
+              case ConnectionState.waiting:
+                return Text('Awaiting result...');
+              case ConnectionState.done:
+                if (snapshot.hasError)
+                  return Text('Error: ${snapshot.error}');
+                if (snapshot.hasData) {
+                  // return Text('Result: ${snapshot.data.latitude}, ${snapshot.data.longitude}');
+                  return GoogleMap(
+                      mapType: MapType.hybrid,
+                      onMapCreated:  (GoogleMapController controller) {
+                        _controller.complete(controller);
+                      },
+                      initialCameraPosition: CameraPosition(
+                        target: new LatLng(snapshot.data.latitude,snapshot.data.longitude),
+                        zoom: 10.0
+                      ),
+                  );
+                }
+            }
+        },);
+
+        return Scaffold(
+          appBar: new AppBar(
+            title: Text("Google Maps Demo"),
+          ),
+          body: Column(
             children: <Widget>[
-              Container(
-                
-                height: MediaQuery.of(context).size.height - 100.0,
-                width: double.infinity,
-                child: mapToggle ? GoogleMap(
-                        mapType: MapType.hybrid,
-                        onMapCreated:  (GoogleMapController controller) {
-                          _controller.complete(controller);
-                        },
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(23.8978328, 87.8121386),
-                          zoom: 10.0
+              Stack(
+                children: <Widget>[
+                  Container(
+                    
+                    height: MediaQuery.of(context).size.height - 100.0,
+                    width: double.infinity,
+                    // Wrap with stream builder could be sloved your problem...
+                    child: mapToggle ? futureBuilder : Center(child: 
+                        Text('Loading...Please wait', style: TextStyle(
+                          fontSize: 20.0
                         ),
-                      ) : Center(child: 
-                      Text('Loading...Please wait', style: TextStyle(
-                        fontSize: 20.0
-                      ),),)
+                      ),
+                    )
               )
             ],
           )
@@ -102,8 +117,10 @@ class _GoogleMapsState extends State<GoogleMaps> {
       ),
     );
   }
+
   Future<void> _goToTheLake() async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
+
 }
