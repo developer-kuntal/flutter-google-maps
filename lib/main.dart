@@ -21,6 +21,7 @@ class GoogleMaps extends StatefulWidget {
 class _GoogleMapsState extends State<GoogleMaps> {
 
   bool mapToggle = false;
+
   GoogleMapController mapController;
   Completer<GoogleMapController> _controller = Completer();
   
@@ -52,18 +53,19 @@ class _GoogleMapsState extends State<GoogleMaps> {
   void initState() {
     super.initState();
     setState(() {
-        mapToggle = true; 
+      mapToggle = true; 
     });
   }
 
-  @override
-  Future<Position> _myStream() async{
-    var position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-    return position;
-  }
+  // @override
+  // Future<Position> _myStream() async{
+  //   var position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+  //   return position;
+  // }
 
   @override
   Widget build(BuildContext context) {
+
     var futureBuilder = new FutureBuilder(
           future: _buildMap(),//_myStream(),
           builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
@@ -80,14 +82,16 @@ class _GoogleMapsState extends State<GoogleMaps> {
                   // return Text('Result: ${snapshot.data.latitude}, ${snapshot.data.longitude}');
                   return GoogleMap(
                       mapType: MapType.hybrid,
-                      onMapCreated:  (GoogleMapController controller) {
+
+                      onMapCreated: (GoogleMapController controller) {
                         _controller.complete(controller);
                       },
+                  
                       initialCameraPosition: CameraPosition(
-                        target: new LatLng(snapshot.data.latitude,snapshot.data.longitude),
+                        target: new LatLng(snapshot.data.latitude, snapshot.data.longitude),
                         zoom: 10.0
                       ),
-                      // onCameraMove: ,
+
                   );
                 }
             }
@@ -116,9 +120,19 @@ class _GoogleMapsState extends State<GoogleMaps> {
               )
             ],
           ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: mapController == null ? null : () {
+              // mapController.addMarker(
+              //   MarkerOptions (
 
-          
+              //   )
+              // );
+            },
+            label: Text('my current position!'),
+            icon: Icon(Icons.location_on),
+          ),
         );
   }
+
 
 }
