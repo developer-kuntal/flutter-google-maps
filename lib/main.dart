@@ -65,6 +65,12 @@ class _GoogleMapsState extends State<GoogleMaps> {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController textEditingController = new TextEditingController();
+
+    TextField textfield = new TextField(
+      controller: textEditingController,
+      decoration: InputDecoration(hintText: "Type in the text for the marker"),
+    );
 
     var futureBuilder = new FutureBuilder(
           future: _buildMap(),//_myStream(),
@@ -92,6 +98,20 @@ class _GoogleMapsState extends State<GoogleMaps> {
                         zoom: 10.0
                       ),
 
+                      compassEnabled: true,
+                      // markers: mapController.animateCamera(
+                      //   CameraUpdate.newCameraPosition( 
+                      //     CameraPosition(target: new LatLng(snapshot.data.latitude, snapshot.data.longitude))
+                      //   ),
+                      // )
+                      // markers: Marker(
+                      //   mapController.animateCamera(
+                      //   CameraUpdate.newCameraPosition( 
+                      //     CameraPosition(target: new LatLng(snapshot.data.latitude, snapshot.data.longitude))
+                      //   ),
+                      // )),
+                      myLocationEnabled: true,
+
                   );
                 }
             }
@@ -115,6 +135,15 @@ class _GoogleMapsState extends State<GoogleMaps> {
                         ),
                       ),
                     )
+                  ),
+                  RaisedButton(
+                    child: const Text('Add a Marker'),
+                    onPressed: () {
+                      // mapController.addMarker(MarkerOptions {
+                        
+                      // });
+                      // new Marker(position: new LatLng(40.71, -74.00), markerId: MarkerId("1"),);
+                    },
                   )
                 ],
               )
@@ -131,6 +160,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
             label: Text('my current position!'),
             icon: Icon(Icons.location_on),
           ),
+          
         );
   }
 
