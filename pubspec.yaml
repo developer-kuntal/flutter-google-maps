@@ -25,8 +25,9 @@ dependencies:
   cupertino_icons: ^0.1.2
 
   geolocator: ^3.0.1
-  google_maps_flutter: 0.5.7
-  flutter_map: 0.5.0
+  google_maps_flutter: ^0.5.7
+  flutter_map: ^0.5.0
+  google_api_availability: ^2.0.0
 
   # firebase_core: ^0.3.4
   # cloud_firestore: ^0.9.10
@@ -47,6 +48,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - logo.png
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg
@@ -63,6 +67,12 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-Regular.ttf
+
   # fonts:
   #   - family: Schyler
   #     fonts:

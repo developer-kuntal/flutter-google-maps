@@ -110,7 +110,7 @@ packages:
     source: hosted
     version: "3.0.1"
   google_api_availability:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: google_api_availability
       url: "https://pub.dartlang.org"

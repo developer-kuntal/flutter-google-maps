@@ -1,12 +1,17 @@
 buildscript {
     repositories {
-        google()
         mavenCentral()
+        google()
         jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        // classpath 'com.android.tools.build:gradle:3.2.1'
+        // classpath 'com.android.tools.build:gradle:3.3.0'
+        // classpath 'com.google.gms:google-services:4.0.1'
+
+        classpath 'com.android.tools.build:gradle:3.4.0'
+        classpath 'com.google.gms:google-services:4.2.0'
     }
 
     subprojects {
@@ -30,6 +35,21 @@ allprojects {
     repositories {
         google()
         jcenter()
+
+        configurations.all {
+            resolutionStrategy {
+                force 'com.google.firebase:firebase-core:16.0.8'
+                force 'com.google.android.gms:play-services-auth:16.0.1'
+                force 'com.google.android.gms:play-services-base:16.1.0'
+                force 'com.google.android.gms:play-services-wallet:16.0.1'
+                force 'com.google.android.gms:play-services-vision:17.0.2'
+                force 'com.google.android.gms:play-services-ads:17.2.0'
+                force 'com.google.android.gms:play-services-location:16.0.0'
+                force 'com.google.firebase:firebase-firestore:18.2.0'
+                force 'com.google.firebase:firebase-functions:16.3.0'
+                force 'com.google.firebase:firebase-storage:16.1.0'
+            }
+        }
     }
 }
 
