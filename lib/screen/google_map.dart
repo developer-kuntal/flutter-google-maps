@@ -75,7 +75,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
                 if (snapshot.hasError)
                   return Text('Error: ${snapshot.error}');
                 if (snapshot.hasData) {
-                  // return Text('Result: ${snapshot.data.latitude}, ${snapshot.data.longitude}');
+                  print('Result: ${snapshot.data.latitude}, ${snapshot.data.longitude}');
                   return GoogleMap(
                       mapType: MapType.hybrid,
 
